@@ -3,6 +3,7 @@ package org.apache.catalina.valves;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.util.LifecycleSupport;
 
 public abstract class BaseValve extends ValveBase implements Lifecycle {
@@ -64,14 +65,14 @@ public abstract class BaseValve extends ValveBase implements Lifecycle {
      *            if this component detects a fatal error
      *            that prevents this component from being used
      */
-    public void start() throws LifecycleException {
+    public void startInternal() throws LifecycleException {
 
         // Validate and update our current component state
         if (started) {
             throw new LifecycleException("valve already started");
         }
 
-        lifecycle.fireLifecycleEvent(START_EVENT, null);
+        setState(LifecycleState.STARTING);
         started = true;
 
         afterStart();
@@ -86,14 +87,14 @@ public abstract class BaseValve extends ValveBase implements Lifecycle {
      *            if this component detects a fatal error
      *            that needs to be reported
      */
-    public void stop() throws LifecycleException {
+    public void stopInternal() throws LifecycleException {
 
         // Validate and update our current component state
         if (!started) {
             throw new LifecycleException("valve not started");
         }
 
-        lifecycle.fireLifecycleEvent(STOP_EVENT, null);
+        setState(LifecycleState.STOPPING);
         started = false;
 
         afterStop();

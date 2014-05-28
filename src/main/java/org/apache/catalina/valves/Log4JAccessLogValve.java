@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -54,7 +55,7 @@ public final class Log4JAccessLogValve extends BaseValve {
 
         public void addElement(final StringBuffer buf, final Date date, final Request request, final Response response,
                 final long time) {
-            long length = response.getContentCountLong();
+            long length = response.getContentWritten();
             if (length <= 0 && conversion) {
                 buf.append('-');
             } else {
@@ -396,14 +397,15 @@ public final class Log4JAccessLogValve extends BaseValve {
         public void addElement(final StringBuffer buf, final Date date, final Request request, final Response response,
                 final long time) {
             if (null != response) {
-                String[] values = response.getHeaderValues(header);
-                if (values.length > 0) {
-                    for (int i = 0; i < values.length; i++) {
-                        String string = values[i];
+                Collection<String> values = response.getHeaders(header);
+                if (values.size() > 0) {
+                    int i = 0;
+                    for (String string : values) {
                         buf.append(string);
-                        if (i + 1 < values.length) {
+                        if (i + 1 < values.size()) {
                             buf.append(",");
                         }
+                        i++;
                     }
                     return;
                 }
